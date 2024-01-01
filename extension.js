@@ -86,7 +86,6 @@ async function activate(context) {
 		
 	})
 
-	context.subscriptions.push(disposable);
 	context.subscriptions.push(convert)
 }
 
