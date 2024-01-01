@@ -1,8 +1,9 @@
 {
   "name": "porter",
-  "displayName": "porter",
+  "displayName": "CodePorter",
   "description": "Simple to use extension to convert code snippets from one language to another",
   "repository": "https://github.com/destrex271/gemini-porter-extension",
+  "publisher": "AkshatJaimini",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.85.0"

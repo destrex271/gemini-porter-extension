@@ -9,9 +9,7 @@ async function activate(context) {
 
 	var apikey = vscode.workspace.getConfiguration().get('porter.apiKey');
 	console.log(apikey)
-	console.log("CHECKINNGGGGG")
 	if(apikey === undefined || apikey.length == 0){
-		console.log("UDDD")
 		const key = await vscode.window.showInputBox({
 			prompt: "Enter your Gemini API Key",
 			placeHolder: "porter.apiKey",
@@ -44,7 +42,7 @@ async function activate(context) {
 
 		vscode.window.withProgress({
 			location: vscode.ProgressLocation.Notification,
-            title: 'Running Long-Running Operation',
+            title: 'Converting',
             cancellable: true
         }, async (progress, token) => {
 			const editor = vscode.window.activeTextEditor;
