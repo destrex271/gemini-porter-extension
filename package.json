@@ -4,7 +4,7 @@
   "description": "Simple to use extension to convert code snippets from one language to another",
   "repository": "https://github.com/destrex271/gemini-porter-extension",
   "publisher": "AkshatJaimini",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -14,10 +14,12 @@
   "activationEvents": [],
   "main": "./extension.js",
   "contributes": {
-    "commands": [{
-      "command": "porter.convert",
-      "title": "Convert Code"
-    }]
+    "commands": [
+      {
+        "command": "porter.convert",
+        "title": "Convert Code"
+      }
+    ]
   },
   "scripts": {
     "lint": "eslint .",
