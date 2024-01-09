@@ -6,38 +6,24 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
  * @param {vscode.ExtensionContext} context
  */
 async function activate(context) {
-
-	var apikey = vscode.workspace.getConfiguration().get('porter.apiKey');
-	console.log(apikey)
-	if(apikey === undefined || apikey.length == 0){
-		const key = await vscode.window.showInputBox({
-			prompt: "Enter your Gemini API Key",
-			placeHolder: "porter.apiKey",
-			password: true
-		})
-		if(key){
-			vscode.workspace.getConfiguration().update('porter.apiKey', key, vscode.ConfigurationTarget.Global);
-			if(key === undefined || key.length == 0){
-				vscode.window.showErrorMessage("API Key not supplied")
-				return;
-			}
-			apikey = key;
-			vscode.window.showInformationMessage('API key set successfully.');
-		}else{
-			vscode.window.showErrorMessage('API Key was not provided!')
+	let model = undefined
+	let convert = vscode.commands.registerCommand('porter.convert', async function(){
+		if(model == undefined)
+			model = await activateGemini()
+		console.log("RECEIVED MODEL: ", model)
+		// return;
+		if(model === undefined){
 			return;
 		}
-	}
-	const genAI = new GoogleGenerativeAI(apikey);
-	const model = genAI.getGenerativeModel({model: "gemini-pro"})
-	console.log('Congratulations, your extension "porter" is now active!');
-
-	let convert = vscode.commands.registerCommand('porter.convert', async function(){
 		// Get Target Language
 		let val = await vscode.window.showInputBox({
 			placeHolder: "Rust",
 			prompt: "Enter your target Language",
 		})
+		if(val == undefined || val.length == 0){
+			vscode.window.showErrorMessage("Target Language not specified!")
+			return;
+		}
 		console.log("LANG", val)
 
 		vscode.window.withProgress({
@@ -57,8 +43,6 @@ async function activate(context) {
 			}
 			const detectedLanguage = await model.generateContent(`In a single word tell me which programming language is this code snippet in:\n${editorContent}`)
 			const src_lang = await detectedLanguage.response.text();
-			// const get_ext = await model.generateContent("in a single word give me the file extension for the programming language "+val)
-			// const ext = await get_ext.response.text()
 
 			var prompt = `Convert Code from ${src_lang} to ${val} language, without any explanation or any comments. Do not mention the language name, just give the code. Only provide a single option. The code to be converted is:\n${editorContent}`
 			model.generateContent(prompt)
@@ -85,10 +69,43 @@ async function activate(context) {
 	})
 
 	context.subscriptions.push(convert)
+
+		
 }
 
 // This method is called when your extension is deactivated
 function deactivate() {}
+
+
+async function activateGemini(){
+	var apikey = vscode.workspace.getConfiguration().get('porter.apiKey');
+	console.log(apikey)
+	if(apikey === undefined || apikey.length == 0){
+		const key = await vscode.window.showInputBox({
+			prompt: "Enter your Gemini API Key",
+			placeHolder: "porter.apiKey",
+			password: true
+		})
+		if(key !== undefined && key.length > 0){
+			vscode.workspace.getConfiguration().update('porter.apiKey', key, vscode.ConfigurationTarget.Global);
+			if(key === undefined || key.length == 0){
+				vscode.window.showErrorMessage("API Key not supplied")
+				return;
+			}
+			apikey = key;
+			vscode.window.showInformationMessage('API key set successfully.');
+		}else{
+			vscode.window.showErrorMessage('API Key was not provided!')
+			return;
+		}
+	}
+	const genAI = new GoogleGenerativeAI(apikey);
+	console.log("GENAI: ", genAI)
+	const model = genAI.getGenerativeModel({model: "gemini-pro"})
+	console.log('Congratulations, your extension "porter" is now active!');
+	console.log("MODEL", model)
+	return model;
+}
 
 function getWebviewContent(code){
     return `<!DOCTYPE html>
@@ -107,5 +124,5 @@ function getWebviewContent(code){
 
 module.exports = {
 	activate,
-	deactivate
+	deactivate,
 }
